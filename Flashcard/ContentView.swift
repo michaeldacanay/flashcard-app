@@ -15,10 +15,15 @@ struct ContentView: View {
         // Card deck
         ZStack {
             ForEach(0..<cards.count, id: \.self) { index in
-                CardView(card: cards[index])
+                CardView(card: cards[index], onSwipedLeft: { // <-- Add swiped left property
+                    cards.remove(at: index) // <-- Remove the card from the cards array
+                }, onSwipedRight: { // <-- Add swiped right property
+                    cards.remove(at: index) // <-- Remove the card from the cards array
+                })
                     .rotationEffect(.degrees(Double(cards.count - 1 - index) * -5))
             }
         }
+        .animation(.bouncy, value: cards)
     }
 }
 

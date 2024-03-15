@@ -11,6 +11,9 @@ struct CardView: View {
     
     let card: Card
     
+    var onSwipedLeft: (() -> Void)? // <-- Add closures to be called when user swipes left or right
+    var onSwipedRight: (() -> Void)?
+    
     @State private var isShowingQuestion = true
     
     @State private var offset: CGSize = .zero // <-- A state property to store the offset
@@ -63,13 +66,29 @@ struct CardView: View {
                 let translation = gesture.translation // <-- Get the current translation value of the gesture. (CGSize with width and height)
                 print(translation) // <-- Print the translation value
                 offset = translation // <-- update the state offset property as the gesture translation changes
+            }.onEnded { gesture in  // <-- onEnded called when gesture ends
+                
+                if gesture.translation.width > swipeThreshold { // <-- Compare the gesture ended translation value to the swipeThreshold
+                    print("👉 Swiped right")
+                    onSwipedRight?() // <-- Call swiped right closure
+
+                } else if gesture.translation.width < -swipeThreshold {
+                    print("👈 Swiped left")
+                    onSwipedLeft?() // <-- Call swiped left closure
+
+                } else {
+                    print("🚫 Swipe canceled")
+                    withAnimation(.bouncy) { // <-- Make updates to state managed property with animation
+                        offset = .zero
+                    }
+                }
             }
         )
     }
 }
 
 // Card data model
-struct Card {
+struct Card: Equatable {
     let question: String
     let answer: String
     
