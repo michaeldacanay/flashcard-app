@@ -16,6 +16,8 @@ struct ContentView: View {
     
     @State private var deckId: Int = 0
     
+    @State private var createCardViewPresented = false
+    
     var body: some View {
         // Card deck
         ZStack {
@@ -51,6 +53,17 @@ struct ContentView: View {
         }
         .animation(.bouncy, value: cards)
         .id(deckId)
+        .sheet(isPresented: $createCardViewPresented, content: {
+            CreateFlashcardView { card in
+                cards.append(card)
+            }
+        })
+        .frame(maxWidth: .infinity, maxHeight: .infinity) // <-- Force the ZStack frame to expand as much as possible (the whole screen in this case)
+        .overlay(alignment: .topTrailing) {
+            Button("Add Flashcard", systemImage: "plus") {
+                createCardViewPresented.toggle()
+            }
+        }
     }
 }
 
